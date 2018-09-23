@@ -2,15 +2,6 @@ package projeto;
 
 import java.awt.*;
 
-
-/**
- * An object of type MovingBall holds data about a "ball" that has
- * a color, radius, position, speed, and direction.  The ball is restricted
- * to moving around inside a rectangle in the xy-plane.  The ball can draw
- * itself in a graphics context and will move when it is told to move.
- * This class uses some trigonometry and vector math in its implementation.
- */
-
 public class Tiro  {
 
    private double xmin, xmax;  // The horizontal limits on the ball's position.
@@ -32,14 +23,6 @@ public class Tiro  {
 
    private double radius;   // The radius of the ball.
 
-
-   /**
-    * Create a ball that moves within the specified limits,
-    * left <= x <= right and top <= y <= bottom.  The ball is initially
-    * located in the middle of this range.  It has a random speed
-    * between 4 and 12 and a random direction.  Its radius is 5
-    * and its color is red.
-    */
    public Tiro(double left, double right, double top, double bottom, int jogadorX, int jogadorY, int mx, int my) {
       xmin = left;
       xmax = right;

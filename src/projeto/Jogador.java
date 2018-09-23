@@ -17,6 +17,8 @@ import javax.swing.ImageIcon;
 public class Jogador extends Base{
     protected ImageIcon imgJogador;
     protected int hp = 3; //3 de hp(saúde)
+    protected int ultimoX;
+    protected int ultimoY;
     
     public Jogador (int width, int height, String url) {
         x = 640;
@@ -51,6 +53,7 @@ public class Jogador extends Base{
     }
 
     private double calculaAngulo(int mx, int my) {
-        return Math.atan2((my - (y + 18 + imgJogador.getIconHeight() / 2)), (mx - (x + imgJogador.getIconWidth() / 2)));
+        return Math.atan2((my - y), (mx - x));
+        //return Math.atan2((my - (y + 200 + imgJogador.getIconHeight() / 2)), (mx - (x + imgJogador.getIconWidth() / 2)));
     }
 }

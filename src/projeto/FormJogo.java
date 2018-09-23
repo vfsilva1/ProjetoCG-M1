@@ -111,7 +111,7 @@ public class FormJogo extends javax.swing.JFrame implements Runnable{
                 break;
             case KeyEvent.VK_SPACE:
                 tiro = true;
-                //play("pistol.wav");
+                play("pistol.wav");
                 break;
             case KeyEvent.BUTTON1_DOWN_MASK:
                 tiro = true;
@@ -165,7 +165,7 @@ public class FormJogo extends javax.swing.JFrame implements Runnable{
     }//GEN-LAST:event_formMouseDragged
 
     private void formMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseClicked
-        //play("pistol.wav");
+        play("pistol.wav");
         tiro = true;
     }//GEN-LAST:event_formMouseClicked
     
@@ -216,7 +216,13 @@ public class FormJogo extends javax.swing.JFrame implements Runnable{
         long start = System.currentTimeMillis();
         ArrayList<Tiro> tiros = new ArrayList<Tiro>();
         ArrayList<Zumbi> zumbis = new ArrayList<Zumbi>();
-        long aux = 1;
+        ArrayList<Obstaculo> obstaculos = new ArrayList<Obstaculo>();
+        
+        obstaculos.add(new Obstaculo(410, 325, 80, 80));
+        obstaculos.add(new Obstaculo(926, 444, 90, 105));
+        obstaculos.add(new Obstaculo(1025, 207, 90, 90));
+        obstaculos.add(new Obstaculo(1085, 40, 200, 80));
+        obstaculos.add(new Obstaculo(1210, 520, 70, 180));
         
         play("audio.wav");
         
@@ -240,9 +246,12 @@ public class FormJogo extends javax.swing.JFrame implements Runnable{
                 limpaTela(g2Jogador);
             
             //jogador
+            jogador.ultimoX = jogador.x;
+            jogador.ultimoY = jogador.y;
             jogador.desenharJogador(g2Jogador, mx, my);
             jogador.mover();
             movimentacaoJogador(jogador);
+            colisaoObstaculos(jogador, obstaculos);
             atirar(g2Tiro, jogador, tiros);
             
             //zumbi
@@ -262,14 +271,10 @@ public class FormJogo extends javax.swing.JFrame implements Runnable{
             //zumbis nascendo
             long end = System.currentTimeMillis();
             long tempoDecorrido = end - start;
-            if(tempoDecorrido < 150) {
+            if(tempoDecorrido < 1) {
                 Zumbi z = new Zumbi("img/zumbi.png");
                 zumbis.add(z);
             }
-            
-            //if(tiros.get(1).getLimites().intersects(zumbis.get(1).getLimites()))
-              //  System.out.println("ACERTOU");
-            //colisaoTiroZumbi(zumbis, tiros);
             
             g2Jogador.dispose();
             getBufferStrategy().show();
@@ -287,7 +292,7 @@ public class FormJogo extends javax.swing.JFrame implements Runnable{
         if (up && jogador.getY() > 80) {
             jogador.setIncY(-2);
         }
-        if (down && jogador.getY() < getHeight() - 110) {
+        if (down && jogador.getY() < getHeight() - 110 ) {
             jogador.setIncY(2);
         }
         if (right && jogador.getX() < getWidth() - jogador.getImgJogador().getIconWidth()) {
@@ -296,6 +301,14 @@ public class FormJogo extends javax.swing.JFrame implements Runnable{
         if (left && jogador.getX() > 40) {
             jogador.setIncX(-2);
         }
+    }
+    
+    private boolean obstaculo(ArrayList<Obstaculo> obstaculos, Jogador jogador){
+        for(Obstaculo o: obstaculos){
+            if(jogador.getLimites().intersects(o.getLimites()))
+                return true;
+        }
+        return false;
     }
     
     private void limpaTela(Graphics2D g2) {
@@ -418,6 +431,13 @@ public class FormJogo extends javax.swing.JFrame implements Runnable{
                 tiros.add(t);
                 tiro = false;
             }
+    }
+
+    private void colisaoObstaculos(Jogador jogador, ArrayList<Obstaculo> obstaculos) {
+        if(obstaculo(obstaculos, jogador)) {
+            jogador.x = jogador.ultimoX;            
+            jogador.y = jogador.ultimoY;            
+        } 
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables
