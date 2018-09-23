@@ -9,6 +9,7 @@ import java.applet.Applet;
 import java.applet.AudioClip;
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -256,8 +257,15 @@ public class FormJogo extends javax.swing.JFrame implements Runnable{
             
             //zumbi
             for(Zumbi z: zumbis){
-                z.desenhar(g2Zumbi, jogador.getX(), jogador.getY());
+                if(z.visivel)
+                    z.desenhar(g2Zumbi, jogador.getX(), jogador.getY());
             }
+            for(Zumbi z: zumbis) {
+                z.ultimoX = z.x;
+                z.ultimoY = z.y;
+                colisaoObstaculos(z, obstaculos);
+            }
+            
             for(Zumbi z: zumbis){
                 z.mover();
             }
@@ -271,7 +279,7 @@ public class FormJogo extends javax.swing.JFrame implements Runnable{
             //zumbis nascendo
             long end = System.currentTimeMillis();
             long tempoDecorrido = end - start;
-            if(tempoDecorrido < 1) {
+            if(tempoDecorrido < 200) {
                 Zumbi z = new Zumbi("img/zumbi.png");
                 zumbis.add(z);
             }
@@ -303,13 +311,7 @@ public class FormJogo extends javax.swing.JFrame implements Runnable{
         }
     }
     
-    private boolean obstaculo(ArrayList<Obstaculo> obstaculos, Jogador jogador){
-        for(Obstaculo o: obstaculos){
-            if(jogador.getLimites().intersects(o.getLimites()))
-                return true;
-        }
-        return false;
-    }
+    
     
     private void limpaTela(Graphics2D g2) {
         desenharCenario(g2);
@@ -401,9 +403,11 @@ public class FormJogo extends javax.swing.JFrame implements Runnable{
                 long elapsedTime = System.currentTimeMillis()- start;
                 elapsedTime = elapsedTime / 1000;
                 
+                String msg = "GAME OVER";
                 g2.setColor(Color.RED);
-                g2.drawString("GAME OVER", 600, 360);
-                g2.drawString("You have survived " + elapsedTime + " seconds!", 550, 400);
+                g2.setFont(new Font("Arial", Font.BOLD, 40));
+                g2.drawString(msg, 520, 360);
+                g2.drawString("You have survived " + elapsedTime + " seconds!", 370, 420);
                 
                 gameOver = true;
             }
@@ -433,11 +437,19 @@ public class FormJogo extends javax.swing.JFrame implements Runnable{
             }
     }
 
-    private void colisaoObstaculos(Jogador jogador, ArrayList<Obstaculo> obstaculos) {
-        if(obstaculo(obstaculos, jogador)) {
-            jogador.x = jogador.ultimoX;            
-            jogador.y = jogador.ultimoY;            
+    private void colisaoObstaculos(Base b, ArrayList<Obstaculo> obstaculos) {
+        if(obstaculo(obstaculos, b)) {
+            b.x = b.ultimoX;            
+            b.y = b.ultimoY;            
         } 
+    }
+    
+    private boolean obstaculo(ArrayList<Obstaculo> obstaculos, Base b){
+        for(Obstaculo o: obstaculos){
+            if(b.getLimites().intersects(o.getLimites()))
+                return true;
+        }
+        return false;
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables

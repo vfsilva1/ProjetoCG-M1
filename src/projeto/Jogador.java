@@ -17,8 +17,7 @@ import javax.swing.ImageIcon;
 public class Jogador extends Base{
     protected ImageIcon imgJogador;
     protected int hp = 3; //3 de hp(saúde)
-    protected int ultimoX;
-    protected int ultimoY;
+    
     
     public Jogador (int width, int height, String url) {
         x = 640;

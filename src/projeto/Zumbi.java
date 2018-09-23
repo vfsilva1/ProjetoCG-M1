@@ -19,11 +19,13 @@ public class Zumbi extends Base{
     Random r = new Random();
     protected int direcaoX;
     protected int direcaoY;
-   
+    public boolean visivel;
+    
     public Zumbi(String url){
         imgZumbi = new ImageIcon(this.getClass().getResource("/").getPath() + url);
         largura = imgZumbi.getIconWidth();
         altura = imgZumbi.getIconHeight();
+        visivel = true;
         random(r);
     }
     

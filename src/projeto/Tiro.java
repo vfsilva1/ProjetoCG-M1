@@ -3,40 +3,30 @@ package projeto;
 import java.awt.*;
 
 public class Tiro  {
-
-   private double xmin, xmax;  // The horizontal limits on the ball's position.
-                               //    The x-coordinate of the ball satisfies
-                               //    xmin <= x <= xmax.
-                               
-   private double ymin, ymax;  // The vertical limits on the ball's position.
-                               //    The y-coordinate of the ball satisfies
-                               //    ymin <= y <= ymax.
+    private double xmin, xmax;  
+    private double ymin, ymax;  
+    private double x,y;      
+    private double dx,dy;    
+    private Color color;     
+    private double radius;
+    public boolean visivel;
    
-   private double x,y;      // Current position of the ball.
    
-   private double dx,dy;    // The velocity (speed + direction) of the ball.
-                            //   When the travel() method is called, the
-                            //   ball moves dx pixels horizontally and dy
-                            //   pixels vertically.
-   
-   private Color color;     // The color of the ball.
-
-   private double radius;   // The radius of the ball.
-
-   public Tiro(double left, double right, double top, double bottom, int jogadorX, int jogadorY, int mx, int my) {
-      xmin = left;
-      xmax = right;
-      ymin = top;
-      ymax = bottom;
-      x = jogadorX + 50;
-      y = jogadorY + 33;
-      radius = 5;
-      color = Color.GRAY;
-      double angle = Math.atan2((my - jogadorY), (mx - jogadorX));  // Random direction.
-      double speed = 8;          // Random speed.
-      dx = Math.cos(angle) * speed;
-      dy = Math.sin(angle) * speed;
-   }
+    public Tiro(double left, double right, double top, double bottom, int jogadorX, int jogadorY, int mx, int my) {
+        xmin = left;
+        xmax = right;
+        ymin = top;
+        ymax = bottom;
+        x = jogadorX + 50;
+        y = jogadorY + 33;
+        radius = 5;
+        color = Color.GRAY;
+        double angle = Math.atan2((my - jogadorY), (mx - jogadorX));  // Random direction.
+        double speed = 8;          // Random speed.
+        dx = Math.cos(angle) * speed;
+        dy = Math.sin(angle) * speed;
+        visivel = true;
+    }
    
 
    /**
@@ -45,10 +35,10 @@ public class Tiro  {
     * 
     */
    
-   public void draw(Graphics g) {
-      g.setColor(color);
-      g.fillOval( (int)(x-radius), (int)(y-radius), (int)(2*radius), (int)(2*radius) );
-   }
+    public void draw(Graphics g) {
+        g.setColor(color);
+        g.fillOval( (int)(x-radius), (int)(y-radius), (int)(2*radius), (int)(2*radius) );
+    }
 
    /**
     * Move the ball by one time unit.  The ball moves in its current

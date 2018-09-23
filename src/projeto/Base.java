@@ -15,11 +15,14 @@ import java.awt.Rectangle;
 public class Base {
     protected int x;
     protected int y;
+    protected int ultimoX;
+    protected int ultimoY;
     protected int incX;
     protected int incY;
     protected Color cor = Color.BLACK;
     protected int altura;
     protected int largura;
+    
 
     public int getAltura() {
         return altura;
