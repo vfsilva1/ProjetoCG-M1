@@ -19,7 +19,7 @@ public class Tiro  {
         ymax = bottom;
         x = jogadorX + 50;
         y = jogadorY + 33;
-        radius = 5;
+        radius = 3;
         color = Color.GRAY;
         double angle = Math.atan2((my - jogadorY), (mx - jogadorX));  // Random direction.
         double speed = 8;          // Random speed.

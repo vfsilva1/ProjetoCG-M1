@@ -19,7 +19,8 @@ public class Zumbi extends Base{
     Random r = new Random();
     protected int direcaoX;
     protected int direcaoY;
-    public boolean visivel;
+    protected boolean visivel;
+    protected static int hp = 3;
     
     public Zumbi(String url){
         imgZumbi = new ImageIcon(this.getClass().getResource("/").getPath() + url);

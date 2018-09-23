@@ -13,6 +13,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
@@ -252,7 +253,8 @@ public class FormJogo extends javax.swing.JFrame implements Runnable{
             jogador.desenharJogador(g2Jogador, mx, my);
             jogador.mover();
             movimentacaoJogador(jogador);
-            colisaoObstaculos(jogador, obstaculos);
+            trataObstaculos(jogador, obstaculos);
+            colisaoTiroZumbi(zumbis, tiros);
             atirar(g2Tiro, jogador, tiros);
             
             //zumbi
@@ -261,20 +263,20 @@ public class FormJogo extends javax.swing.JFrame implements Runnable{
                     z.desenhar(g2Zumbi, jogador.getX(), jogador.getY());
             }
             for(Zumbi z: zumbis) {
-                z.ultimoX = z.x;
-                z.ultimoY = z.y;
-                colisaoObstaculos(z, obstaculos);
+                if(z.visivel) {
+                    z.ultimoX = z.x;
+                    z.ultimoY = z.y;
+                    movimentacaoZumbi(z, jogador);
+                    colisaoZumbiJogador(z, jogador);
+                    trataObstaculos(z, obstaculos);
+                }
+            }
+            for(Zumbi z: zumbis){
+                if(z.visivel)
+                    z.mover();
             }
             
-            for(Zumbi z: zumbis){
-                z.mover();
-            }
-            for(Zumbi z: zumbis) {
-                colisaoZumbiJogador(z, jogador);
-            }
-            for(Zumbi z: zumbis) {
-                movimentacaoZumbi(z, jogador);
-            }
+            
 
             //zumbis nascendo
             long end = System.currentTimeMillis();
@@ -283,7 +285,10 @@ public class FormJogo extends javax.swing.JFrame implements Runnable{
                 Zumbi z = new Zumbi("img/zumbi.png");
                 zumbis.add(z);
             }
-            
+            else if(tempoDecorrido > 5000 && tempoDecorrido < 5300) {
+                Zumbi z = new Zumbi("img/zumbi.png");
+                zumbis.add(z);
+            }            
             g2Jogador.dispose();
             getBufferStrategy().show();
             try {
@@ -359,26 +364,36 @@ public class FormJogo extends javax.swing.JFrame implements Runnable{
     }
 
     private void colisaoZumbiJogador(Zumbi zumbi, Jogador jogador) {
+        int zumbiX = zumbi.x;
+        int zumbiY = zumbi.y;
+        int jogadorX = jogador.x;
+        int jogadorY = jogador.y;
         
-        if(zumbi.getX() == jogador.getX() && zumbi.getY() == jogador.getY() && direcao(zumbi) == 1){
-            zumbi.setIncY(-50);
-            jogador.hp--;
-            play("ouch.wav");
-        }
-        else if(zumbi.getX() == jogador.getX() && zumbi.getY() == jogador.getY() && direcao(zumbi) == 2){
-            zumbi.setIncX(50);
-            jogador.hp--;
-            play("ouch.wav");
-        }
-        else if(zumbi.getX() == jogador.getX() && zumbi.getY() == jogador.getY() && direcao(zumbi) == 3){
-            zumbi.setIncY(50);
-            jogador.hp--;
-            play("ouch.wav");
-        }
-        else if(zumbi.getX() == jogador.getX() && zumbi.getY() == jogador.getY() && direcao(zumbi) == 4){
-            zumbi.setIncX(-50);
-            jogador.hp--;
-            play("ouch.wav");
+        
+        if((zumbiX == jogadorX) && (zumbiY == jogadorY)){
+            switch (direcao(zumbi)) {
+                case 1:
+                    zumbi.setIncY(-100);
+                    jogador.hp--;
+                    play("ouch.wav");
+                    break;
+                case 2:
+                    zumbi.setIncX(100);
+                    jogador.hp--;
+                    play("ouch.wav");
+                    break;
+                case 3:
+                    zumbi.setIncY(100);
+                    jogador.hp--;
+                    play("ouch.wav");
+                    break;
+                case 4:
+                    zumbi.setIncX(-100);
+                    jogador.hp--;
+                    play("ouch.wav");
+                    break;    
+            }
+            System.out.println(jogador.hp);
         }
     }
     
@@ -413,22 +428,29 @@ public class FormJogo extends javax.swing.JFrame implements Runnable{
             }
     }
 
-    /*private void colisaoTiroZumbi(ArrayList<Zumbi> zumbis, ArrayList<Tiro> tiros) {
+    private void colisaoTiroZumbi(ArrayList<Zumbi> zumbis, ArrayList<Tiro> tiros) {
         for(Tiro t: tiros){
-            for(Zumbi z: zumbis){
-                //System.out.println("teste");
-                if(t.getLimites().intersects(z.getLimites()))
-                    System.out.println("PEGOU!");
+            Rectangle r1 = t.getLimites();
+            for(Zumbi z: zumbis) {
+                Rectangle r2 = z.getLimites();
+                
+                if(r1.intersects(r2)) {
+                    System.out.println(z.hp);
+                    t.visivel = false;
+                    z.visivel = false;
+                }
             }
         }
-    }*/
+    }
 
     private void atirar(Graphics2D g2Tiro, Jogador jogador, ArrayList<Tiro> tiros) {
         for(Tiro t: tiros){
-                t.draw(g2Tiro);
+                if(t.visivel)
+                    t.draw(g2Tiro);
             }
             for(Tiro t: tiros){
-                t.travel();
+                if(t.visivel)
+                    t.travel();
             }
             if(tiro){
                 Tiro t = new Tiro(0, 1280, 0, 720, jogador.x, jogador.y, mx, my);
@@ -437,14 +459,14 @@ public class FormJogo extends javax.swing.JFrame implements Runnable{
             }
     }
 
-    private void colisaoObstaculos(Base b, ArrayList<Obstaculo> obstaculos) {
-        if(obstaculo(obstaculos, b)) {
+    private void trataObstaculos(Base b, ArrayList<Obstaculo> obstaculos) {
+        if(colisaoObstaculo(obstaculos, b)) {
             b.x = b.ultimoX;            
             b.y = b.ultimoY;            
         } 
     }
     
-    private boolean obstaculo(ArrayList<Obstaculo> obstaculos, Base b){
+    private boolean colisaoObstaculo(ArrayList<Obstaculo> obstaculos, Base b){
         for(Obstaculo o: obstaculos){
             if(b.getLimites().intersects(o.getLimites()))
                 return true;
