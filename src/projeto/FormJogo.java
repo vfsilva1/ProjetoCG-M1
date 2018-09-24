@@ -20,6 +20,10 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Random;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import javax.swing.ImageIcon;
 import sun.audio.*;
 /**
@@ -235,17 +239,14 @@ public class FormJogo extends javax.swing.JFrame implements Runnable{
         cursorTransparente();
         
         while(!gameOver) {
+            g2GameOver = (Graphics2D) getBufferStrategy().getDrawGraphics();
             g2Jogador = (Graphics2D) getBufferStrategy().getDrawGraphics();
             g2Cenario = (Graphics2D) getBufferStrategy().getDrawGraphics();
-            g2GameOver = (Graphics2D) getBufferStrategy().getDrawGraphics();
             g2Zumbi = (Graphics2D) getBufferStrategy().getDrawGraphics();
             g2Tiro = (Graphics2D) getBufferStrategy().getDrawGraphics();
             g2 = (Graphics2D) getBufferStrategy().getDrawGraphics();
             
-            fimJogo(g2GameOver, jogador, start);
-            
-            if(!gameOver)
-                limpaTela(g2Jogador);
+            limpaTela(g2Jogador);
             
             //jogador
             jogador.ultimoX = jogador.x;
@@ -257,38 +258,12 @@ public class FormJogo extends javax.swing.JFrame implements Runnable{
             colisaoTiroZumbi(zumbis, tiros);
             atirar(g2Tiro, jogador, tiros);
             
-            //zumbi
-            for(Zumbi z: zumbis){
-                if(z.visivel)
-                    z.desenhar(g2Zumbi, jogador.getX(), jogador.getY());
-            }
-            for(Zumbi z: zumbis) {
-                if(z.visivel) {
-                    z.ultimoX = z.x;
-                    z.ultimoY = z.y;
-                    movimentacaoZumbi(z, jogador);
-                    colisaoZumbiJogador(z, jogador);
-                    trataObstaculos(z, obstaculos);
-                }
-            }
-            for(Zumbi z: zumbis){
-                if(z.visivel)
-                    z.mover();
-            }
+            //nascer zumbis
+            zumbis(g2Zumbi, jogador, zumbis);
             
+            //verifica se o jogador esta sem vida (acaba o jogo)
+            fimJogo(g2GameOver, jogador, start);
             
-
-            //zumbis nascendo
-            long end = System.currentTimeMillis();
-            long tempoDecorrido = end - start;
-            if(tempoDecorrido < 200) {
-                Zumbi z = new Zumbi("img/zumbi.png");
-                zumbis.add(z);
-            }
-            else if(tempoDecorrido > 5000 && tempoDecorrido < 5300) {
-                Zumbi z = new Zumbi("img/zumbi.png");
-                zumbis.add(z);
-            }            
             g2Jogador.dispose();
             getBufferStrategy().show();
             try {
@@ -315,8 +290,6 @@ public class FormJogo extends javax.swing.JFrame implements Runnable{
             jogador.setIncX(-2);
         }
     }
-    
-    
     
     private void limpaTela(Graphics2D g2) {
         desenharCenario(g2);
@@ -412,13 +385,15 @@ public class FormJogo extends javax.swing.JFrame implements Runnable{
     }
 
     private void fimJogo(Graphics2D g2, Jogador jogador, long start) {
-        if(jogador.getHp() == 0) {
+        if(jogador.getHp() < 1) {
                 play("death.wav");
                 play("gameOver.wav");
                 long elapsedTime = System.currentTimeMillis()- start;
                 elapsedTime = elapsedTime / 1000;
                 
                 String msg = "GAME OVER";
+                g2.setColor(Color.BLACK);
+                g2.fillRect(350, 300, 600, 160);
                 g2.setColor(Color.RED);
                 g2.setFont(new Font("Arial", Font.BOLD, 40));
                 g2.drawString(msg, 520, 360);
@@ -433,9 +408,7 @@ public class FormJogo extends javax.swing.JFrame implements Runnable{
             Rectangle r1 = t.getLimites();
             for(Zumbi z: zumbis) {
                 Rectangle r2 = z.getLimites();
-                
                 if(r1.intersects(r2)) {
-                    System.out.println(z.hp);
                     t.visivel = false;
                     z.visivel = false;
                 }
@@ -472,6 +445,43 @@ public class FormJogo extends javax.swing.JFrame implements Runnable{
                 return true;
         }
         return false;
+    }
+
+    private void zumbis(Graphics2D g2Zumbi, Jogador jogador, ArrayList<Zumbi> zumbis) {
+        Random r = new Random();
+        int n = r.nextInt(3000) + 1;
+        
+        if(n < 10){
+            zumbis.add(new Zumbi("img/zumbi.png"));
+        }
+        else if(n < 20) {
+            zumbis.add(new Zumbi("img/zumbi.png"));
+            zumbis.add(new Zumbi("img/zumbi.png"));
+        }
+        else if (n < 30) {
+            zumbis.add(new Zumbi("img/zumbi.png"));
+            zumbis.add(new Zumbi("img/zumbi.png"));
+            zumbis.add(new Zumbi("img/zumbi.png"));
+        }
+
+        //zumbi
+        for(Zumbi z: zumbis){
+            if(z.visivel)
+                z.desenhar(g2Zumbi, jogador.getX(), jogador.getY());
+        }
+        for(Zumbi z: zumbis) {
+            if(z.visivel) {
+                z.ultimoX = z.x -1;
+                z.ultimoY = z.y -1;
+                movimentacaoZumbi(z, jogador);
+                colisaoZumbiJogador(z, jogador);
+                //trataObstaculos(z, obstaculos);
+            }
+        }
+        for(Zumbi z: zumbis){
+            if(z.visivel)
+                z.mover();
+        }
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables
