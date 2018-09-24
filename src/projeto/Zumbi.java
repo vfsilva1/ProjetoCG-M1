@@ -20,6 +20,7 @@ public class Zumbi extends Base{
     protected int direcaoX;
     protected int direcaoY;
     protected boolean visivel;
+    protected int speed = 1;
     protected static int hp = 3;
     
     public Zumbi(String url){
