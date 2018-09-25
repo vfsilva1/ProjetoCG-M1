@@ -248,7 +248,7 @@ public class FormJogo extends javax.swing.JFrame implements Runnable{
             g2Tiro = (Graphics2D) getBufferStrategy().getDrawGraphics();
             g2 = (Graphics2D) getBufferStrategy().getDrawGraphics();
             
-            limpaTela(g2Jogador);
+            limpaTela(g2Cenario);
             
             //jogador
             jogador.ultimoX = jogador.x;
@@ -261,8 +261,9 @@ public class FormJogo extends javax.swing.JFrame implements Runnable{
             atirar(g2Tiro, jogador, tiros);
             
             //nascer zumbis
-            zumbis(g2Zumbi, jogador, zumbis, obstaculos);
+            zumbis(g2Zumbi, jogador, zumbis, obstaculos, start);
             
+            //mira
             g2.setColor(Color.red);
             g2.fillOval(mx, my, 10, 10);
             
@@ -330,7 +331,7 @@ public class FormJogo extends javax.swing.JFrame implements Runnable{
         AudioClip audio = Applet.newAudioClip(url);
         audio.play();
         
-        if("rain.wav".equals(nomeAudio))
+        if("audio.wav".equals(nomeAudio))
             audio.loop();
     }
 
@@ -363,7 +364,7 @@ public class FormJogo extends javax.swing.JFrame implements Runnable{
                     play("ouch.wav");
                     break;    
             }
-            System.out.println(jogador.hp);
+            //System.out.println(jogador.hp);
         }
     }
     
@@ -406,7 +407,7 @@ public class FormJogo extends javax.swing.JFrame implements Runnable{
             for(Zumbi z: zumbis) {
                 Rectangle r2 = z.getLimites();
                 if(r1.intersects(r2)) {
-                    t.visivel = false;
+                    //t.visivel = false;
                     z.visivel = false;
                     //zumbis.remove(z);
                     //tiros.remove(t);
@@ -446,28 +447,87 @@ public class FormJogo extends javax.swing.JFrame implements Runnable{
         return false;
     }
 
-    private void zumbis(Graphics2D g2Zumbi, Jogador jogador, ArrayList<Zumbi> zumbis, ArrayList<Obstaculo> obstaculos) {
+    private void zumbis(Graphics2D g2Zumbi, Jogador jogador, ArrayList<Zumbi> zumbis, ArrayList<Obstaculo> obstaculos, long start) {
         Random r = new Random();
         int n = r.nextInt(3000) + 1;
-        int speed = 1;
+        long tempo = System.currentTimeMillis() - start;
+        tempo = tempo / 1000;
         
-        if(n < 10){
-            zumbis.add(new Zumbi("img/zumbi.png"));
+        if(tempo < 20) {
+            if(n < 10){
+                zumbis.add(new Zumbi("img/zumbi.png"));
+            }
+            else if(n < 20) {
+                zumbis.add(new Zumbi("img/zumbi.png"));
+                zumbis.add(new Zumbi("img/zumbi.png"));
+            }
+            else if (n < 30) {
+                zumbis.add(new Zumbi("img/zumbi.png"));
+                zumbis.add(new Zumbi("img/zumbi.png"));
+                zumbis.add(new Zumbi("img/zumbi.png"));
+            }
+            else if(n > 2990 & n < 3000){
+                Zumbi z = new Zumbi("img/zumbi.png");
+                z.speed = 3;
+                zumbis.add(z);
+            }
         }
-        else if(n < 20) {
-            zumbis.add(new Zumbi("img/zumbi.png"));
-            zumbis.add(new Zumbi("img/zumbi.png"));
+        else if(tempo < 30) {
+            if(n < 10){
+                Zumbi z = new Zumbi("img/zumbi.png");
+                z.speed = 1;
+                zumbis.add(z);
+                Zumbi z2 = new Zumbi("img/zumbi.png");
+                z2.speed = 3;
+                zumbis.add(z2);
+            }
+            else if(n < 30) {
+                Zumbi z = new Zumbi("img/zumbi.png");
+                z.speed = 1;
+                zumbis.add(z);
+                Zumbi z2 = new Zumbi("img/zumbi.png");
+                z2.speed = 3;
+                zumbis.add(z2);
+            }
+            else if (n < 50) {
+                Zumbi z = new Zumbi("img/zumbi.png");
+                z.speed = 3;
+                zumbis.add(z);
+                Zumbi z2 = new Zumbi("img/zumbi.png");
+                z2.speed = 3;
+                zumbis.add(z2);
+            }
         }
-        else if (n < 30) {
-            zumbis.add(new Zumbi("img/zumbi.png"));
-            zumbis.add(new Zumbi("img/zumbi.png"));
-            zumbis.add(new Zumbi("img/zumbi.png"));
+        else if(tempo > 30) {
+             if(n < 10){
+                Zumbi z = new Zumbi("img/zumbi.png");
+                z.speed = 3;
+                zumbis.add(z);
+                Zumbi z2 = new Zumbi("img/zumbi.png");
+                z.speed = 3;
+                zumbis.add(z);
+                Zumbi z3 = new Zumbi("img/zumbi.png");
+                z.speed = 3;
+                zumbis.add(z);
+            }
+            else if(n < 30) {
+                Zumbi z = new Zumbi("img/zumbi.png");
+                z.speed = 3;
+                zumbis.add(z);
+                Zumbi z2 = new Zumbi("img/zumbi.png");
+                z2.speed = 3;
+                zumbis.add(z2);
+            }
+            else if (n < 50) {
+                Zumbi z = new Zumbi("img/zumbi.png");
+                z.speed = 3;
+                zumbis.add(z);
+                Zumbi z2 = new Zumbi("img/zumbi.png");
+                z2.speed = 3;
+                zumbis.add(z2);
+            }
         }
-        else if(n > 2990 & n < 3000){
-            Zumbi z = new Zumbi("img/zumbi.png");
-            z.speed = 3;
-            zumbis.add(z);
-        }
+        
         
         //zumbi
         for(Zumbi z: zumbis){
